@@ -7,6 +7,7 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+	"os"
 	"strings"
 	"time"
 
@@ -22,6 +23,7 @@ const (
 // X-API-KEY header.
 type Serper struct {
 	APIKey   string
+	BaseURL  string
 	client   *http.Client
 	endpoint string
 }
@@ -30,6 +32,7 @@ type Serper struct {
 func NewSerper(apiKey string) *Serper {
 	return &Serper{
 		APIKey:   apiKey,
+		BaseURL:  os.Getenv("SERPER_BASE_URL"),
 		client:   &http.Client{Timeout: 10 * time.Second},
 		endpoint: serperEndpoint,
 	}
@@ -38,7 +41,7 @@ func NewSerper(apiKey string) *Serper {
 // NewSerperWithClient constructs a Serper search provider using the supplied HTTP client.
 // This is useful for overriding the default timeout.
 func NewSerperWithClient(apiKey string, client *http.Client) *Serper {
-	return &Serper{APIKey: apiKey, client: client, endpoint: serperEndpoint}
+	return &Serper{APIKey: apiKey, BaseURL: os.Getenv("SERPER_BASE_URL"), client: client, endpoint: serperEndpoint}
 }
 
 // Search posts a query to Serper and converts organic results to SearchResult values.
@@ -60,6 +63,9 @@ func (s *Serper) Search(ctx context.Context, query string) ([]laconic.SearchResu
 	endpoint := s.endpoint
 	if endpoint == "" {
 		endpoint = serperEndpoint
+	}
+	if s.BaseURL != "" {
+		endpoint = strings.TrimRight(s.BaseURL, "/") + "/search"
 	}
 
 	var resp *http.Response

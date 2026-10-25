@@ -1,5 +1,14 @@
 # laconic
 
+### Serper-compatible endpoints
+
+Set `SERPER_BASE_URL` before constructing a Serper provider, or set its
+`BaseURL` field directly. The provider appends `/search`, accepts trailing
+slashes, and preserves `https://google.serper.dev/search` when unset. Use the
+compatible provider's key as the existing constructor API-key argument.
+
+Support any Serper.dev-compatible endpoint (like litescrape.com, serpbase.dev, serpensapi.org, and others)
+
 A tiny Go library for building research agents that stay fast and cheap on small-context models.
 
 ## Why?
